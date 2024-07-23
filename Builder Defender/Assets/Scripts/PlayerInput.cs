@@ -5,9 +5,19 @@ public class PlayerInput : MonoBehaviour, IInput
 {
     private InputActions _inputActions;
     private InputAction _mousePosition, _mouseClick;
+    public static PlayerInput Instance { get; private set; }
 
     private void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(this.gameObject);
+            return;
+        }
         _inputActions = new InputActions();
         _mousePosition = _inputActions.GamePlay.MousePosition;
         _mouseClick = _inputActions.GamePlay.MouseClick;

@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 957c1a94a986b0241a631bb80dd6a231, type: 3}
+  m_Name: BlueMill
+  m_EditorClassIdentifier: 
+  Name: Blue Mill
+  Prefab: {fileID: 3614982577557344904, guid: 0293885a429940a4e871943bedc60ded, type: 3}
