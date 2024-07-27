@@ -1,19 +1,20 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class BuildingManager : MonoBehaviour
 {
+    public static BuildingManager Instance { get; private set; }
     private BuildingTypeCollectionSO _buildingTypeCollection;
-    private BuildingTypeSO _buildingType;
+    private BuildingTypeSO _activeBuildingType;
     private IInput _playerInput;
     private FrameInput _frameInput;
     private Camera _mainCamera;
-    private int _currentIndex;
 
     private void Awake()
     {
+        Instance = this;
         _buildingTypeCollection = Resources.Load<BuildingTypeCollectionSO>(typeof(BuildingTypeCollectionSO).Name);
-        _currentIndex = 0;
-        _buildingType = _buildingTypeCollection.List[_currentIndex];
+        _activeBuildingType = _buildingTypeCollection.List[0];
     }
 
     private void Start()
@@ -26,19 +27,22 @@ public class BuildingManager : MonoBehaviour
     private void Update()
     {
         _frameInput = _playerInput.GatherInput();
-        //if (_frameInput.MouseClick)
-        //{
-        //    Debug.Log(_buildingType);
-        //    Debug.Log(_buildingType.Prefab);
-        //    Debug.Log(_mainCamera);
-        //    Instantiate(_buildingType.Prefab, GetMouseWorldPosition(), Quaternion.identity);
-        //    _currentIndex = (_currentIndex + 1) % _buildingTypeCollection.List.Count;
-        //    _buildingType = _buildingTypeCollection.List[_currentIndex];
-        //}
+        if (_frameInput.MouseClick && !EventSystem.current.IsPointerOverGameObject())
+        {
+            Debug.Log(_activeBuildingType);
+            Debug.Log(_activeBuildingType.Prefab);
+            Debug.Log(_mainCamera);
+            Instantiate(_activeBuildingType.Prefab, GetMouseWorldPosition(), Quaternion.identity);
+        }
     }
 
     private Vector2 GetMouseWorldPosition()
     {
         return (_mainCamera.ScreenToWorldPoint(_frameInput.MousePosition));
+    }
+
+    public void SetActiveBuildingType(BuildingTypeSO buildingType)
+    {
+        _activeBuildingType = buildingType;
     }
 }

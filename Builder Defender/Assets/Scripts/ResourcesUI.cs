@@ -17,16 +17,16 @@ public class ResourcesUI : MonoBehaviour
         _resourceTypeTransformDictionary = new();
 
         _resourceTemplate.gameObject.SetActive(false);
-        int _currentOffsetAmountIndex = 0;
+        int currentOffsetAmountIndex = 0;
         foreach (ResourceTypeSO resourceType in _resourceTypeCollection.List)
         {
             Transform resourceTransform = Instantiate(_resourceTemplate, transform);
             resourceTransform.gameObject.SetActive(true);
-            resourceTransform.GetComponent<RectTransform>().anchoredPosition = new Vector2(offsetAmount * _currentOffsetAmountIndex, 0);
+            resourceTransform.GetComponent<RectTransform>().anchoredPosition = new Vector2(offsetAmount * currentOffsetAmountIndex, 0);
             resourceTransform.GetComponentInChildren<Image>().sprite = resourceType.Sprite;
 
             _resourceTypeTransformDictionary[resourceType] = resourceTransform;
-            _currentOffsetAmountIndex++;
+            currentOffsetAmountIndex++;
         }
     }
 
