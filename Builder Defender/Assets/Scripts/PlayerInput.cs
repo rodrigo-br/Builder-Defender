@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 public class PlayerInput : MonoBehaviour, IInput
 {
     private InputActions _inputActions;
-    private InputAction _mousePosition, _mouseClick;
+    private InputAction _mousePosition, _mouseClick, _mouseScroll;
     public static PlayerInput Instance { get; private set; }
 
     private void Awake()
@@ -21,6 +21,7 @@ public class PlayerInput : MonoBehaviour, IInput
         _inputActions = new InputActions();
         _mousePosition = _inputActions.GamePlay.MousePosition;
         _mouseClick = _inputActions.GamePlay.MouseClick;
+        _mouseScroll = _inputActions.GamePlay.MouseScroll;
     }
 
     private void OnEnable()
@@ -38,7 +39,8 @@ public class PlayerInput : MonoBehaviour, IInput
         return new FrameInput
         {
             MousePosition = _mousePosition.ReadValue<Vector2>(),
-            MouseClick = _mouseClick.WasPressedThisFrame()
+            MouseClick = _mouseClick.WasPressedThisFrame(),
+            MouseScroll = _mouseScroll.ReadValue<float>()
         };
     }
 }
@@ -47,6 +49,7 @@ public struct FrameInput
 {
     public Vector2 MousePosition;
     public bool MouseClick;
+    public float MouseScroll;
 }
 
 public interface IInput

@@ -20,17 +20,21 @@ public class BuildingManager : MonoBehaviour
     {
         _mainCamera = Camera.main;
         _playerInput = PlayerInput.Instance;
+        Debug.Log(_playerInput);
     }
 
     private void Update()
     {
         _frameInput = _playerInput.GatherInput();
-        if (_frameInput.MouseClick)
-        {
-            Instantiate(_buildingType.Prefab, GetMouseWorldPosition(), Quaternion.identity);
-            _currentIndex = (_currentIndex + 1) % _buildingTypeCollection.List.Count;
-            _buildingType = _buildingTypeCollection.List[_currentIndex];
-        }
+        //if (_frameInput.MouseClick)
+        //{
+        //    Debug.Log(_buildingType);
+        //    Debug.Log(_buildingType.Prefab);
+        //    Debug.Log(_mainCamera);
+        //    Instantiate(_buildingType.Prefab, GetMouseWorldPosition(), Quaternion.identity);
+        //    _currentIndex = (_currentIndex + 1) % _buildingTypeCollection.List.Count;
+        //    _buildingType = _buildingTypeCollection.List[_currentIndex];
+        //}
     }
 
     private Vector2 GetMouseWorldPosition()

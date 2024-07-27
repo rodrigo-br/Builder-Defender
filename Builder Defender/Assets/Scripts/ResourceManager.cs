@@ -1,14 +1,18 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class ResourceManager : MonoBehaviour
 {
+    public event EventHandler OnResourceAmountChange;
+    public static ResourceManager Instance { get; private set; }
     private Dictionary<ResourceTypeSO, int> _resourceAmountDictionary;
     private IInput _playerInput;
     private FrameInput _frameInput;
 
     private void Awake()
     {
+        Instance = this;
         _resourceAmountDictionary = new Dictionary<ResourceTypeSO, int>();
         ResourceTypeCollectionSO resourceTypeCollection = Resources.Load<ResourceTypeCollectionSO>(typeof(ResourceTypeCollectionSO).Name);
 
@@ -29,8 +33,6 @@ public class ResourceManager : MonoBehaviour
         _frameInput = _playerInput.GatherInput();
         if (_frameInput.MouseClick)
         {
-            ResourceTypeCollectionSO resourceTypeCollection = Resources.Load<ResourceTypeCollectionSO>(typeof(ResourceTypeCollectionSO).Name);
-            AddResource(resourceTypeCollection.List[0], 2);
             TestLogResourceAmountDictionary();
         }
     }
@@ -46,5 +48,11 @@ public class ResourceManager : MonoBehaviour
     public void AddResource(ResourceTypeSO resourceType, int amount)
     {
         _resourceAmountDictionary[resourceType] += amount;
+        OnResourceAmountChange?.Invoke(this, EventArgs.Empty);
+    }
+
+    public int GetResourceAmount(ResourceTypeSO resourceType)
+    {
+        return _resourceAmountDictionary[resourceType];
     }
 }
