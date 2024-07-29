@@ -6,6 +6,7 @@ public class PlayerInput : MonoBehaviour, IInput
     private InputActions _inputActions;
     private InputAction _mousePosition, _mouseClick, _mouseScroll;
     public static PlayerInput Instance { get; private set; }
+    public Vector3 MousePosition => _mousePosition.ReadValue<Vector2>();
 
     private void Awake()
     {

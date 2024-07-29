@@ -1,48 +1,64 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class BuildingManager : MonoBehaviour
 {
     public static BuildingManager Instance { get; private set; }
-    private BuildingTypeCollectionSO _buildingTypeCollection;
+    public event EventHandler<OnActiveBuildingTypeChangedEventArgs> OnActiveBuildingTypeChanged;
+    public FrameInput FrameInput { get; private set; }
     private BuildingTypeSO _activeBuildingType;
     private IInput _playerInput;
-    private FrameInput _frameInput;
-    private Camera _mainCamera;
+    private bool _canPlaceBuilding = true;
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
-        _buildingTypeCollection = Resources.Load<BuildingTypeCollectionSO>(typeof(BuildingTypeCollectionSO).Name);
-        _activeBuildingType = _buildingTypeCollection.List[0];
     }
 
     private void Start()
     {
-        _mainCamera = Camera.main;
         _playerInput = PlayerInput.Instance;
         Debug.Log(_playerInput);
     }
 
     private void Update()
     {
-        _frameInput = _playerInput.GatherInput();
-        if (_frameInput.MouseClick && !EventSystem.current.IsPointerOverGameObject())
+        FrameInput = _playerInput.GatherInput();
+        if (FrameInput.MouseClick && !EventSystem.current.IsPointerOverGameObject() && _activeBuildingType != null && _canPlaceBuilding)
         {
-            Debug.Log(_activeBuildingType);
-            Debug.Log(_activeBuildingType.Prefab);
-            Debug.Log(_mainCamera);
-            Instantiate(_activeBuildingType.Prefab, GetMouseWorldPosition(), Quaternion.identity);
+            Instantiate(_activeBuildingType.Prefab, Utils.GetMouseWorldPosition(), Quaternion.identity);
+            SetActiveBuildingType(null);
         }
-    }
-
-    private Vector2 GetMouseWorldPosition()
-    {
-        return (_mainCamera.ScreenToWorldPoint(_frameInput.MousePosition));
     }
 
     public void SetActiveBuildingType(BuildingTypeSO buildingType)
     {
         _activeBuildingType = buildingType;
+        OnActiveBuildingTypeChangedEventArgs onActiveBuildingTypeChangedEventArgs = new();
+        if (buildingType != null)
+        {
+            onActiveBuildingTypeChangedEventArgs.Sprite = buildingType.Sprite;
+            onActiveBuildingTypeChangedEventArgs.ResourceDetectionRadius = buildingType.ResourceGeneratorData.ResourceDetectionRadius;
+            onActiveBuildingTypeChangedEventArgs.BuildingType = buildingType;
+        }
+        OnActiveBuildingTypeChanged?.Invoke(this, onActiveBuildingTypeChangedEventArgs);
+    }
+
+    public void SetCanPlaceBuilding(bool value)
+    {
+        _canPlaceBuilding = value;
+    }
+
+    public class OnActiveBuildingTypeChangedEventArgs : EventArgs
+    {
+        public Sprite Sprite;
+        public float ResourceDetectionRadius;
+        public BuildingTypeSO BuildingType;
     }
 }
