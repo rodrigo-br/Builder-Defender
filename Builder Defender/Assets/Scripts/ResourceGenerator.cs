@@ -1,21 +1,72 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class ResourceGenerator : MonoBehaviour
 {
+    public BuildingTypeSO BuildingType { get; private set; }
     private ResourceGeneratorData _resourceGeneratorData;
+    private LineRenderer _lineRenderer;
     private float _timerMax;
     private float _timer;
     private int _nearbyResourceAmount;
+    private int _nearbyBuildingsPenalty = -1;
 
     private void Awake()
     {
-        _resourceGeneratorData = GetComponent<BuildingTypeHolder>().BuildingType.ResourceGeneratorData;
+        BuildingType = GetComponent<BuildingTypeHolder>().BuildingType;
+        _lineRenderer = GetComponent<LineRenderer>();
+        _resourceGeneratorData = BuildingType.ResourceGeneratorData;
         _timerMax = _resourceGeneratorData.TimerMax;
+        DrawPenaltyRadius();
+        _lineRenderer.enabled = false;
     }
 
     private void Start()
+    {
+        GetResourcesNearby();
+        GetBuildingsNearby();
+    }
+
+    private void Update()
+    {
+        _timer -= Time.deltaTime;
+        if (_timer <= 0f)
+        {
+            _timer += _timerMax;
+            ResourceManager.Instance.AddResource(_resourceGeneratorData.ResourceType, _nearbyResourceAmount - (_nearbyBuildingsPenalty * _resourceGeneratorData.BuildingPenaltyAmount));
+        }
+    }
+
+    private void OnEnable()
+    {
+        BuildingGhost.OnShowBuildingGhost += CheckBuildingTypePenalty;
+    }
+
+    private void CheckBuildingTypePenalty(object sender, BuildingTypeSO e)
+    {
+        _lineRenderer.enabled = e == BuildingType;
+    }
+
+    public void DrawPenaltyRadius()
+    {
+        _lineRenderer.gameObject.SetActive(true);
+        int segments = 100;
+        _lineRenderer.positionCount = segments + 1;
+        _lineRenderer.useWorldSpace = false;
+        _lineRenderer.startWidth = 0.1f;
+        _lineRenderer.endWidth = 0.1f;
+
+        float angle = 0f;
+        for (int i = 0; i < segments + 1; i++)
+        {
+            float x = Mathf.Sin(Mathf.Deg2Rad * angle) * _resourceGeneratorData.BuildingPenaltyRadius;
+            float y = Mathf.Cos(Mathf.Deg2Rad * angle) * _resourceGeneratorData.BuildingPenaltyRadius;
+            _lineRenderer.SetPosition(i, new Vector3(x, y, 0));
+            angle += (360f / segments);
+        }
+    }
+
+    private void GetResourcesNearby()
     {
         Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, _resourceGeneratorData.ResourceDetectionRadius);
 
@@ -29,14 +80,18 @@ public class ResourceGenerator : MonoBehaviour
         }
     }
 
-    private void Update()
+    private void GetBuildingsNearby()
     {
-        _timer -= Time.deltaTime;
-        if (_timer <= 0f)
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, _resourceGeneratorData.BuildingPenaltyRadius);
+        foreach (Collider2D collider in colliders)
         {
-            _timer += _timerMax;
-            ResourceManager.Instance.AddResource(_resourceGeneratorData.ResourceType, _nearbyResourceAmount);
+            BuildingTypeHolder buildingTypeHolder = collider.GetComponent<BuildingTypeHolder>();
+            if (buildingTypeHolder != null && buildingTypeHolder.BuildingType == BuildingType)
+            {
+                _nearbyBuildingsPenalty++;
+            }
         }
+        Debug.Log($"Buildings Nearby: {_nearbyBuildingsPenalty}");
     }
 
     private void OnDrawGizmosSelected()

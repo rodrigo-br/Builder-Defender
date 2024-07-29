@@ -6,12 +6,12 @@ public class ResourceManager : MonoBehaviour
 {
     public event EventHandler OnResourceAmountChange;
     public static ResourceManager Instance { get; private set; }
-    private Dictionary<ResourceTypeSO, int> _resourceAmountDictionary;
+    private Dictionary<ResourceTypeSO, float> _resourceAmountDictionary;
 
     private void Awake()
     {
         Instance = this;
-        _resourceAmountDictionary = new Dictionary<ResourceTypeSO, int>();
+        _resourceAmountDictionary = new Dictionary<ResourceTypeSO, float>();
         ResourceTypeCollectionSO resourceTypeCollection = Resources.Load<ResourceTypeCollectionSO>(typeof(ResourceTypeCollectionSO).Name);
 
         foreach (ResourceTypeSO resourceType in resourceTypeCollection.List)
@@ -20,7 +20,7 @@ public class ResourceManager : MonoBehaviour
         }
     }
 
-    public void AddResource(ResourceTypeSO resourceType, int amount)
+    public void AddResource(ResourceTypeSO resourceType, float amount)
     {
         _resourceAmountDictionary[resourceType] += amount;
         OnResourceAmountChange?.Invoke(this, EventArgs.Empty);
@@ -28,6 +28,6 @@ public class ResourceManager : MonoBehaviour
 
     public int GetResourceAmount(ResourceTypeSO resourceType)
     {
-        return _resourceAmountDictionary[resourceType];
+        return (int)_resourceAmountDictionary[resourceType];
     }
 }

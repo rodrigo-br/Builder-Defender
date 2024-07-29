@@ -12,6 +12,7 @@ public class BuildingTypeSelectUI : MonoBehaviour
         BuildingTypeCollectionSO buildingTypeCollection = Resources.Load<BuildingTypeCollectionSO>(typeof(BuildingTypeCollectionSO).Name);
 
         int currentOffsetAmountIndex = 0;
+        buildingTypeCollection.List.Reverse();
         foreach (BuildingTypeSO buildingType in buildingTypeCollection.List)
         {
             Transform buttonTransform = Instantiate(_buttonTemplate, transform);

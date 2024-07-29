@@ -1,18 +1,20 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using static BuildingManager;
 
 public class BuildingGhost : MonoBehaviour
 {
+    public static event EventHandler<BuildingTypeSO> OnShowBuildingGhost;
     [SerializeField] private Tilemap _tilemap;
     [SerializeField] private Color _denyColor;
     [SerializeField] private Color _allowColor;
     private SpriteRenderer _spriteRenderer;
     private LineRenderer _lineRenderer;
+    private BuildingTypeSO _activateBuildingType;
     private PolygonCollider2D _activeBuildingTypeCollider;
     private PolygonCollider2D _currentBuildingTypeCollider;
+
 
     private void Awake()
     {
@@ -53,6 +55,7 @@ public class BuildingGhost : MonoBehaviour
         }
         _activeBuildingTypeCollider = eventArgs.BuildingType.Prefab.GetComponent<PolygonCollider2D>();
         _currentBuildingTypeCollider.points = _activeBuildingTypeCollider.points;
+        _activateBuildingType = eventArgs.BuildingType;
         Show(eventArgs.Sprite, eventArgs.ResourceDetectionRadius);
     }
 
@@ -67,11 +70,13 @@ public class BuildingGhost : MonoBehaviour
     {
         this.gameObject.SetActive(true);
         _spriteRenderer.sprite = ghostSprite;
+        OnShowBuildingGhost?.Invoke(this, _activateBuildingType);
         DrawCircle(radius);
     }
 
     private void Hide()
     {
+        OnShowBuildingGhost?.Invoke(this, null);
         this.gameObject.SetActive(false);
     }
 
