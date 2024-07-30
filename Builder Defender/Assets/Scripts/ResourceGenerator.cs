@@ -17,8 +17,15 @@ public class ResourceGenerator : MonoBehaviour
         _lineRenderer = GetComponent<LineRenderer>();
         _resourceGeneratorData = BuildingType.ResourceGeneratorData;
         _timerMax = _resourceGeneratorData.TimerMax;
-        DrawPenaltyRadius();
-        _lineRenderer.enabled = false;
+        if (_lineRenderer != null)
+        {
+            DrawPenaltyRadius();
+            _lineRenderer.enabled = false;
+        }
+        if (gameObject.CompareTag("Base"))
+        {
+            _nearbyResourceAmount = 1;
+        }
     }
 
     private void Start()
@@ -33,13 +40,24 @@ public class ResourceGenerator : MonoBehaviour
         if (_timer <= 0f)
         {
             _timer += _timerMax;
-            ResourceManager.Instance.AddResource(_resourceGeneratorData.ResourceType, _nearbyResourceAmount - (_nearbyBuildingsPenalty * _resourceGeneratorData.BuildingPenaltyAmount));
+            ResourceManager.Instance.AddResource(_resourceGeneratorData.ResourceType, _nearbyResourceAmount * (1 - (_nearbyBuildingsPenalty * _resourceGeneratorData.BuildingPenaltyAmount)));
         }
     }
 
     private void OnEnable()
     {
-        BuildingGhost.OnShowBuildingGhost += CheckBuildingTypePenalty;
+        if (_lineRenderer != null)
+        {
+            BuildingGhost.OnShowBuildingGhost += CheckBuildingTypePenalty;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (_lineRenderer != null)
+        {
+            BuildingGhost.OnShowBuildingGhost -= CheckBuildingTypePenalty;
+        }
     }
 
     private void CheckBuildingTypePenalty(object sender, BuildingTypeSO e)
@@ -49,7 +67,6 @@ public class ResourceGenerator : MonoBehaviour
 
     public void DrawPenaltyRadius()
     {
-        _lineRenderer.gameObject.SetActive(true);
         int segments = 100;
         _lineRenderer.positionCount = segments + 1;
         _lineRenderer.useWorldSpace = false;
@@ -91,13 +108,5 @@ public class ResourceGenerator : MonoBehaviour
                 _nearbyBuildingsPenalty++;
             }
         }
-        Debug.Log($"Buildings Nearby: {_nearbyBuildingsPenalty}");
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.green;
-
-        Gizmos.DrawWireSphere(transform.position, _resourceGeneratorData.ResourceDetectionRadius);
     }
 }

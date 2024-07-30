@@ -24,7 +24,6 @@ public class BuildingManager : MonoBehaviour
     private void Start()
     {
         _playerInput = PlayerInput.Instance;
-        Debug.Log(_playerInput);
     }
 
     private void Update()
