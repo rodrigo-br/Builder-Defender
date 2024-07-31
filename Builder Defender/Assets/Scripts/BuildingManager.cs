@@ -31,6 +31,8 @@ public class BuildingManager : MonoBehaviour
         FrameInput = _playerInput.GatherInput();
         if (FrameInput.MouseClick && !EventSystem.current.IsPointerOverGameObject() && _activeBuildingType != null && _canPlaceBuilding)
         {
+            if (!ResourceManager.Instance.CanAfford(_activeBuildingType.ConstructionResourceCostArray)) { return; }
+            ResourceManager.Instance.SpendResources(_activeBuildingType.ConstructionResourceCostArray);
             Instantiate(_activeBuildingType.Prefab, Utils.GetMouseWorldPosition(), Quaternion.identity);
             SetActiveBuildingType(null);
         }

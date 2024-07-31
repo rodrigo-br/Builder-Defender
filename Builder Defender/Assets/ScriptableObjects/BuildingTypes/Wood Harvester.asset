@@ -21,3 +21,6 @@ MonoBehaviour:
     BuildingPenaltyRadius: 2
     BuildingPenaltyAmount: 0.1
   Sprite: {fileID: 21300000, guid: d237fae667a20b749a20a711231fcfa4, type: 3}
+  ConstructionResourceCostArray:
+  - ResourceType: {fileID: 11400000, guid: 92d0fad3adeb44542ad1774eeedf99bf, type: 2}
+    Amount: 20
